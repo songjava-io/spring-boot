@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/board-layout}">
+	<th:block layout:fragment="content">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">번호</th>
+					<th scope="col">제목</th>
+					<th scope="col">등록일자</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- 게시물 목록을 반복 -->
+				<tr th:each="board : ${boardList}">
+					<th scope="row">[[${board.boardSeq}]]</th>
+					<td>
+						<a th:href="@{/board/{boardSeq}(boardSeq=${board.boardSeq})}">
+							[[${board.title}]]
+						</a>
+					</td>
+					<td>[[${board.regDate}]]</td>
+				</tr>
+				<!-- 게시물 데이터가 없는경우 -->
+				<tr th:if="${boardList.size() == 0}">
+					<td colspan="3">게시물이 존재하지 않습니다.</td>
+				</tr>
+			</tbody>
+		</table>
+	</th:block>
+</html>

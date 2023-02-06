@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<script th:inline="javascript">
+	var message = [[${message}]];
+	alert('[BOARD_API] ' + message);
+	history.back();
+	</script>
+</body>
+</html>

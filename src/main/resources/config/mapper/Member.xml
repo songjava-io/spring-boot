@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.songjava.web.mapper.MemberMapper">
+
+	<select id="selectMemberAccountCount" parameterType="String" resultType="int">
+		SELECT COUNT(1)
+		FROM T_MEMBER
+		WHERE ACCOUNT = #{account}
+	</select>
+	
+	<!-- 회원 아이디로 조회 (Security 인증 전용) -->
+	<select id="selectMemberAccount" parameterType="String" 
+		resultType="kr.songjava.web.domain.Member">
+		SELECT 
+			MEMBER_SEQ,
+			PASSWORD,
+			NICKNAME
+		FROM T_MEMBER
+		WHERE ACCOUNT = #{account}
+	</select>	
+
+	<insert id="insertMember" parameterType="kr.songjava.web.domain.Member"
+		useGeneratedKeys="true" keyProperty="memberSeq">
+		INSERT INTO T_MEMBER
+		(
+			ACCOUNT,
+			PASSWORD,
+			NICKNAME,
+			PROFILE_IMAGE_PATH,
+			PROFILE_IMAGE_NAME,
+			JOIN_DATE
+		)
+		VALUES
+		(
+			#{account},
+			#{password},
+			#{nickname},
+			#{profileImagePath},
+			#{profileImageName},			
+			NOW()
+		)
+	</insert>
+	
+	<!-- 회원 로그인 일자 업데이트 -->
+	<update id="updateMemberLoginDate" parameterType="int">
+		UPDATE T_MEMBER
+		SET
+			LOGIN_DATE = NOW()
+		WHERE MEMBER_SEQ = #{memberSeq}
+	</update>
+	
+</mapper>
+
+

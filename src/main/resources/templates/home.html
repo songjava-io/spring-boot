@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default-layout}">
+	<th:block layout:fragment="content">
+		<p>나의 나이는 [[${age}]]</p>
+		<!-- 조건식 -->
+		<p th:if="${display}">저의 이름은 송영문 입니다.</p>
+		<p th:unless="${display}">저의 이름은 손흥민 입니다.</p>
+		<!-- 반복문 -->
+		<ul>
+			<li th:each="framework : ${frameworks}" 
+				th:text="${framework}">JAVA</li>
+		</ul>
+	</th:block>	
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.songjava.web.mapper.BoardMapper">
+
+	<!-- 게시물 목록 조회 쿼리 -->
+	<select id="selectBoardList" resultType="kr.songjava.web.domain.Board">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			REG_DATE
+		FROM T_BOARD
+		<!-- query 검색어가 공백이 아닌경우 -->
+		<if test="query != null and query.length() > 0">
+		WHERE TITLE LIKE CONCAT('%', CONCAT(#{query}, '%'))
+		</if>
+		ORDER BY REG_DATE DESC
+	</select>
+	
+	<!-- 게시물 조회 쿼리 -->
+	<select id="selectBoard" parameterType="int"
+		 resultType="kr.songjava.web.domain.Board">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			CONTENTS,
+			MEMBER_SEQ,
+			REG_DATE
+		FROM T_BOARD
+		WHERE BOARD_SEQ = #{boardSeq}
+	</select>
+	
+	<insert id="insertBoard" parameterType="kr.songjava.web.domain.Board"
+		useGeneratedKeys="true" keyProperty="boardSeq">
+		INSERT INTO T_BOARD
+		(
+			TITLE,
+			CONTENTS,
+			MEMBER_SEQ,
+			REG_DATE
+		)
+		VALUES
+		(
+			#{title},
+			#{contents},
+			#{memberSeq},
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateBoard" parameterType="kr.songjava.web.domain.Board">
+		UPDATE T_BOARD
+		SET
+			TITLE = #{title},
+			CONTENTS = #{contents}
+		WHERE BOARD_SEQ = #{boardSeq}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM T_BOARD
+		WHERE BOARD_SEQ = #{boardSeq}
+	</delete>
+	
+</mapper>
+
+

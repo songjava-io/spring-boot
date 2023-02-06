@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default-layout}">
+	<th:block layout:fragment="content">
+		<form th:action="${board == null ? '/board/save' : '/board/update'}" method="post">
+			
+			<input type="hidden" name="boardSeq"
+				th:if="${board != null}" 
+				th:value="${board.boardSeq}" />
+			
+			<div class="mb-3">
+				<label for="title" class="form-label">제목</label>
+				<input type="text" class="form-control"
+					name="title" id="title" th:value="${board?.title}" 
+					placeholder="게시글의 제목">
+			</div>
+			<div class="mb-3">
+				<label for="contents" class="form-label">내용</label>
+				<textarea class="form-control" 
+					name="contents" 
+					id="contents"
+					rows="3">[[${board?.contents}]]</textarea>
+			</div>
+			<button type="submit" class="btn btn-primary">등록하기</button>
+		</form>
+	</th:block>
+</html>

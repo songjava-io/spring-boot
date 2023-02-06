@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default-layout}">
+	<th:block layout:fragment="content">
+		<form id="member-form" action="/member/login" method="post">
+			<div class="mb-3">
+				<label for="account" class="form-label">계정</label>
+				<input type="text" class="form-control"
+					name="account" id="account"
+					placeholder="계정">
+			</div>
+			<div class="mb-3">
+				<label for="password" class="form-label">비밀번호</label>
+				<input type="password" class="form-control"
+					name="password" id="password"
+					placeholder="비밀번호">
+			</div>
+			<button type="submit" class="btn btn-primary">로그인</button>
+		</form>
+	</th:block>
+	<th:block layout:fragment="script">
+		<script>
+		// jquery 문법을 사용하기 위한 함수
+		$(function() {
+			var $form = $('#member-form');
+			// 등록하기 버튼 이벤트 (form)에 대한 submit을 감지
+			$form.submit(function() {
+				// 서버로 데이터를 전송하는 함수 호출
+				$.ajax({
+					url: $form.attr('action'),
+					type: $form.attr('method'),
+					data: {
+						account: $form.find('input[name=account]').val(),
+						password: $form.find('input[name=password]').val(),
+					},
+					success: function(data) {
+						console.log(data);
+						alert('로그인을 성공하였습니다.');
+						location.href = '/';
+					},
+					error: function(data) {
+						alert(data.responseJSON.message);
+					}
+				});
+				
+				// 페이지가 이동되제 않게 false
+				return false;
+			});
+		});
+		</script>
+	</th:block>
+</html>
