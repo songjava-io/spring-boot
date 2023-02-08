@@ -1,5 +1,8 @@
 package kr.songjava.web.service;
 
+import java.util.Arrays;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -59,6 +62,10 @@ public class MemberService implements UserDetailsService {
 		memberMapper.updateMemberLoginDate(memberSeq);
 	}
 
+	public Member selectMemberAccount(String username) {
+		return memberMapper.selectMemberAccount(username);
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		log.info("loadUserByUsername : {}", username);
@@ -72,6 +79,7 @@ public class MemberService implements UserDetailsService {
 			.nickname(member.getNickname())
 			.username(username)
 			.password(member.getPassword())
+			.authorities(Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")))
 			.build();
 	}
 	

@@ -47,7 +47,7 @@ public class MemberAuthInterceptor implements HandlerInterceptor {
 			// 현재(URL에 맵핑된) 실행 될 컨트롤러에 메소드에 선언된 어노테이션을 가져옴
 			RequestConfig config = method.getMethodAnnotation(RequestConfig.class);
 			if (config != null) {
-				modelAndView.addObject("menu", config.menu());
+				// modelAndView.addObject("menu", config.menu());
 			}
 		}		
 	}

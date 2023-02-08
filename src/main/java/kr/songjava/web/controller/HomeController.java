@@ -3,11 +3,14 @@ package kr.songjava.web.controller;
 import java.util.Arrays;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.songjava.web.interceptor.RequestConfig;
+import kr.songjava.web.security.userdetails.SecurityUserDetails;
 import kr.songjava.web.service.HomeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,4 +38,12 @@ public class HomeController {
 				"Vue.js", "React"));
 		return "home";
 	}
+	
+	@GetMapping(value = { "/userinfo" })
+	@RequestConfig(menu = "HOME")
+	@ResponseBody
+	public SecurityUserDetails userinfo(@AuthenticationPrincipal SecurityUserDetails userDetails) {
+		return userDetails;
+	}
+	
 }

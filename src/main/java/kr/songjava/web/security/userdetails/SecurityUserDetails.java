@@ -1,10 +1,8 @@
 package kr.songjava.web.security.userdetails;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Builder;
@@ -19,11 +17,13 @@ public class SecurityUserDetails implements UserDetails {
 	private final String username;
 	private final String password;
 	private final String nickname;
+	private final Collection<? extends GrantedAuthority> authorities;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// 권한을 추가해줘야 로그인 이후 오류가 발생안함.
-		return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+		// return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+		return authorities;
 	}
 
 	@Override
