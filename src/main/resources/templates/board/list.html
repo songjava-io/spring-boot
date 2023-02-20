@@ -16,7 +16,7 @@
 				<tr th:each="board : ${boardList}">
 					<th scope="row">[[${board.boardSeq}]]</th>
 					<td>
-						<a th:href="@{/board/{boardSeq}(boardSeq=${board.boardSeq})}">
+						<a th:href="@{/board/{boardType}/{boardSeq}(boardType=${board.boardType}, boardSeq=${board.boardSeq})}">
 							[[${board.title}]]
 						</a>
 					</td>
@@ -28,5 +28,7 @@
 				</tr>
 			</tbody>
 		</table>
+		<a th:href="@{/board/{boardType}/form(boardType=${boardType})}"
+				 class="btn btn-secondary">등록하기</a>
 	</th:block>
 </html>

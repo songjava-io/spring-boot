@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/default-layout}">
+	layout:decorate="~{layouts/board-layout}">
 	<th:block layout:fragment="content">
 		<form th:action="${board == null ? '/board/save' : '/board/update'}" method="post">
 			
 			<input type="hidden" name="boardSeq"
 				th:if="${board != null}" 
 				th:value="${board.boardSeq}" />
+				
+			<input type="hidden" name="boardType" th:value="${boardType}" />				
 			
 			<div class="mb-3">
 				<label for="title" class="form-label">제목</label>

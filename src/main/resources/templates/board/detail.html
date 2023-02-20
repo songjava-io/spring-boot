@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/default-layout}">
+	layout:decorate="~{layouts/board-layout}">
 	<th:block layout:fragment="content">
 		<div class="card text-center">
 		  <div class="card-header">
@@ -16,9 +16,9 @@
 		  </div>
 		</div>		
 		<div class="mt-2">
-			<a href="/board/list" class="btn btn-primary">목록</a>
+			<a th:href="@{/board/{boardType}(boardType=${board.boardType})}" class="btn btn-primary">목록</a>
 			
-			<a th:href="@{/board/edit/{boardSeq}(boardSeq=${board.boardSeq})}"
+			<a th:href="@{/board/{boardType}/edit/{boardSeq}(boardType=${board.boardType}, boardSeq=${board.boardSeq})}"
 				 class="btn btn-secondary">편집</a>
 				 
 			<a href="javascript:handleDelete();"

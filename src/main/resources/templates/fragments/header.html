@@ -12,13 +12,13 @@
 	          <a class="nav-link" th:classappend="${menu == 'HOME' ? 'active' : ''}" href="/">Home</a>
 	        </li>
 	        <li class="nav-item">
-	          <a class="nav-link" th:classappend="${menu == 'BOARD' ? 'active' : ''}" href="/board">게시판</a>
+	          <a class="nav-link" th:classappend="${menu == 'BOARD' ? 'active' : ''}" href="/board/notice">게시판</a>
 	        </li>
 	        <li class="nav-item">
 	          <a class="nav-link" th:classappend="${menu == 'MEMBER' ? 'active' : ''}" href="/member/form">회원가입</a>
 	        </li>	        
 	      </ul>
-	      <form action="/board" class="d-flex" role="search">
+	      <form action="/board/notice" class="d-flex" role="search">
 	        <input name="query" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
 	        <button class="btn btn-outline-success" type="submit">Search</button>
 	      </form>

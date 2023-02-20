@@ -18,6 +18,7 @@ public interface BoardMapper {
 	 * 
 	 * @return @
 	 */
+	// public List<Board> selectBoardList2(@Param("boardType") BoardType boardType, @Param("query") String query);
 	public List<Board> selectBoardList(Map<String, Object> paramMap);
 
 	/**

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class Board {
 
 	private int boardSeq;
+	private BoardType boardType;
 	private String title;
 	private String contents;
 	private int memberSeq;
