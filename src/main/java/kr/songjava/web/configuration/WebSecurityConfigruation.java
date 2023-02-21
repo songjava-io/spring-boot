@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -22,6 +23,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
+import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
+import kr.songjava.web.service.SecurityOauth2Service;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +35,9 @@ public class WebSecurityConfigruation {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http,
 			JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
-			JwtTokenAuthenticationManager jwtTokenAuthenticationManager) throws Exception {
+			JwtTokenAuthenticationManager jwtTokenAuthenticationManager,
+			Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
+			SecurityOauth2Service oauth2Service) throws Exception {
 		http.authorizeRequests()
 			// 해당 url 패턴은 로그인 권한없어도 접근되게
 			.antMatchers(
@@ -51,6 +56,12 @@ public class WebSecurityConfigruation {
 			.anyRequest().hasRole("USER").and()
 			// csrf 사용안함.
 			.csrf().disable()
+			.oauth2Login().successHandler(oauth2AuthenticationSuccessHandler)
+				.userInfoEndpoint().userService(oauth2Service)
+				.and().and()
+			.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)			
+			.and()
 			.formLogin(form -> {
 				form.successHandler(jwtTokenAuthenticationSuccessHandler);
 				form.permitAll();
