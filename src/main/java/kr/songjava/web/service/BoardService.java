@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import kr.songjava.web.domain.Board;
+import kr.songjava.web.domain.BoardComment;
+import kr.songjava.web.mapper.BoardCommentMapper;
 import kr.songjava.web.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardService {
 
 	private final BoardMapper boardMapper;
+	private final BoardCommentMapper boardCommentMapper;
 	
 	public List<Board> selectBoardList(Map<String, Object> paramMap) {
 		return boardMapper.selectBoardList(paramMap);
@@ -27,6 +30,10 @@ public class BoardService {
 	 */
 	public Board selectBoard(int boardSeq) {
 		return boardMapper.selectBoard(boardSeq);
+	}
+	
+	public List<BoardComment> selectBoardCommentList(int boardSeq) {
+		return boardCommentMapper.selectBoardCommentList(boardSeq);
 	}
 	
 	/**
@@ -49,10 +56,29 @@ public class BoardService {
 	}
 	
 	/**
+	 * 게시글 댓글을 저장 처리.
+	 * @param comment
+	 */
+	public void saveComment(BoardComment comment) {
+		boardCommentMapper.insertBoardComment(comment);
+	}
+	
+	/**
 	 * 게시물 삭제 처리.
 	 * @param boardSeq
 	 */
 	public void delete(int boardSeq) {
 		boardMapper.deleteBoard(boardSeq);
+		boardCommentMapper.deleteBoardCommentByBoardSeq(boardSeq);
 	}
+	
+	/**
+	 * 게시물 댓글 삭제 처리.
+	 * @param boardCommentSeq
+	 */
+	public void deleteComment(int boardCommentSeq) {
+		boardCommentMapper.deleteBoardComment(boardCommentSeq);
+	}
+	
+	
 }

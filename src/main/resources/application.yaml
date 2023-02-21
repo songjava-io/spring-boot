@@ -29,6 +29,7 @@ spring:
 mybatis:
   mapper-locations:
   - classpath:config/mapper/Board.xml
+  - classpath:config/mapper/BoardComment.xml
   - classpath:config/mapper/Member.xml
   configuration:
     map-underscore-to-camel-case: true

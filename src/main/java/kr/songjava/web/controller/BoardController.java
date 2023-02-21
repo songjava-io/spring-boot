@@ -90,6 +90,8 @@ public class BoardController {
 		Assert.notNull(board, "게시글 정보가 없습니다.");
 		model.addAttribute("board", board);
 		model.addAttribute("boardTypes", BoardType.values());
+		// 게시글의 댓글 목록
+		model.addAttribute("boardComments", boardService.selectBoardCommentList(boardSeq));
 		return "/board/detail";
 	}
 	
