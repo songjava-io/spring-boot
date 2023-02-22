@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.songjava.web.domain.Board;
 import kr.songjava.web.domain.BoardComment;
@@ -32,8 +33,22 @@ public class BoardService {
 		return boardMapper.selectBoard(boardSeq);
 	}
 	
+	/**
+	 * 게시물에 등록된 코멘트 목록 리턴
+	 * @param boardSeq
+	 * @return
+	 */
 	public List<BoardComment> selectBoardCommentList(int boardSeq) {
 		return boardCommentMapper.selectBoardCommentList(boardSeq);
+	}
+	
+	/**
+	 * 게시물 코멘트 단건 조회
+	 * @param boardCommentSeq
+	 * @return
+	 */
+	public BoardComment selectBoardComment(int boardCommentSeq) {
+		return boardCommentMapper.selectBoardComment(boardCommentSeq);
 	}
 	
 	/**
@@ -62,11 +77,12 @@ public class BoardService {
 	public void saveComment(BoardComment comment) {
 		boardCommentMapper.insertBoardComment(comment);
 	}
-	
+
 	/**
 	 * 게시물 삭제 처리.
 	 * @param boardSeq
 	 */
+	@Transactional
 	public void delete(int boardSeq) {
 		boardMapper.deleteBoard(boardSeq);
 		boardCommentMapper.deleteBoardCommentByBoardSeq(boardSeq);
@@ -79,6 +95,5 @@ public class BoardService {
 	public void deleteComment(int boardCommentSeq) {
 		boardCommentMapper.deleteBoardComment(boardCommentSeq);
 	}
-	
 	
 }

@@ -12,9 +12,9 @@
 	<artifactId>songjava-springboot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>songjava-springboot</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Demo project fodr Spring Boot</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -24,6 +24,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<!-- 타임리프에서 Security 접근을 위한 디펜던시 추가 -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -17,6 +17,7 @@ import kr.songjava.web.error.CustomErrorAttributes;
 import kr.songjava.web.interceptor.MemberAuthInterceptor;
 import kr.songjava.web.interceptor.MemberRealnameCheckInterceptor;
 import kr.songjava.web.interceptor.RequestLoggingInterceptor;
+import kr.songjava.web.thymeleaf.HtmlTagDialect;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -81,5 +82,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		.order(2);		
 	}
 	
+	@Bean
+	public HtmlTagDialect htmlTagDialect() {
+		return new HtmlTagDialect();
+	}
 	
 }
