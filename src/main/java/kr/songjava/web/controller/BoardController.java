@@ -92,7 +92,7 @@ public class BoardController {
 		model.addAttribute("boardTypes", BoardType.values());
 		// 게시글의 댓글 목록
 		model.addAttribute("boardComments", boardService.selectBoardCommentList(boardSeq));
-		return "/board/detail";
+		return "board/detail";
 	}
 	
 	/**
@@ -117,7 +117,7 @@ public class BoardController {
 		model.addAttribute("boardType", boardType);
 		model.addAttribute("board", board);
 		model.addAttribute("boardTypes", BoardType.values());
-		return "/board/form";
+		return "board/form";
 	}
 	
 	/**
