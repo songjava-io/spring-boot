@@ -22,6 +22,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
+import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
+import kr.songjava.web.security.userdetails.SecurityOauth2Service;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +33,10 @@ public class WebSecurityConfigruation {
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http,
-			JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
-			JwtTokenAuthenticationManager jwtTokenAuthenticationManager) throws Exception {
+		JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
+		JwtTokenAuthenticationManager jwtTokenAuthenticationManager,
+		Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
+		SecurityOauth2Service securityOauth2Service) throws Exception {
 		http.authorizeRequests()
 			// 해당 url 패턴은 로그인 권한없어도 접근되게
 			.antMatchers(
@@ -51,6 +55,9 @@ public class WebSecurityConfigruation {
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게
 			.anyRequest().hasRole("USER").and()
+			.oauth2Login().successHandler(oauth2AuthenticationSuccessHandler)
+				.userInfoEndpoint().userService(securityOauth2Service)
+			.and().and()
 			// csrf 사용안함.
 			.csrf().disable()
 			.formLogin(form -> {
