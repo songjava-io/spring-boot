@@ -44,7 +44,9 @@ public class WebSecurityConfigruation {
 				"/member/save",
 				"/member/save-upload",
 				"/member/join**",
-				"/member/realname-callback"
+				"/member/realname-callback",
+				"/kakao/login",
+				"/kakao/calllback"
 			)
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게
