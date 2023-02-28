@@ -60,4 +60,5 @@ logging:
     
 # 파일 업로드 관련 설정    
 file:
-  root-path: /spring-boot-fileupload    
+  rootPath: /spring-boot-fileupload
+  resourcePath: /static/image/**

@@ -24,15 +24,19 @@ import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.SecurityOauth2Service;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfigruation {
 
 	private static final String JWT_SECRET_KEY = "asdfcdsr432rsdcsdfsdfdsfsdfsfdfcds";
 	
+	private final FileProperties fileProperties;
+	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http,
+	SecurityFilterChain securityFilterChain(HttpSecurity http,
 		JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
 		JwtTokenAuthenticationManager jwtTokenAuthenticationManager,
 		Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
@@ -50,7 +54,8 @@ public class WebSecurityConfigruation {
 				"/member/join**",
 				"/member/realname-callback",
 				"/kakao/login",
-				"/kakao/calllback"
+				"/kakao/calllback",
+				fileProperties.resourcePath()
 			)
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게
@@ -77,17 +82,17 @@ public class WebSecurityConfigruation {
 	 * @return
 	 */
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 	
 	@Bean
-	public JwtEncoder jwtEncoder() {
+	JwtEncoder jwtEncoder() {
 		return new NimbusJwtEncoder(new ImmutableSecret<SecurityContext>(JWT_SECRET_KEY.getBytes()));
 	}
 	
 	@Bean
-	public JwtDecoder jwtDecoder() {
+	JwtDecoder jwtDecoder() {
 		SecretKeySpec secretKeySpec = new SecretKeySpec(JWT_SECRET_KEY.getBytes(), JWSAlgorithm.HS256.getName());
 		return NimbusJwtDecoder.withSecretKey(secretKeySpec).build();
 	}

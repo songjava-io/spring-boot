@@ -1,17 +1,12 @@
 package kr.songjava.web.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +15,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +27,8 @@ import kr.songjava.web.exception.ApiException;
 import kr.songjava.web.form.MemberSaveForm;
 import kr.songjava.web.form.MemberSaveUploadForm;
 import kr.songjava.web.interceptor.RequestConfig;
+import kr.songjava.web.service.FileCopyResult;
+import kr.songjava.web.service.FileService;
 import kr.songjava.web.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 
 	private final MemberService memberService;
-	
-	@Value("${file.root-path}")
-	private String rootPath;
+	private final FileService fileService;
 	
 	/**
 	 * 회원 로그인 화면
@@ -101,13 +95,15 @@ public class MemberController {
 	 * 회원 가입 처리.
 	 * @param form
 	 * @return
+	 * @throws IOException 
+	 * @throws MalformedURLException 
 	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping("/save")
 	@RequestConfig(menu = "MEMBER")
 	@ResponseBody
 	public HttpEntity<Boolean> save(HttpServletRequest request, @Validated MemberSaveForm form, 
-			OAuth2AuthenticationToken token) {
+			OAuth2AuthenticationToken token) throws MalformedURLException, IOException {
 		log.info("form : {}", form);
 		log.info("nickname : {}", form.getNickname());
 		// 사용이 불가능 상태인경우
@@ -123,49 +119,16 @@ public class MemberController {
 		String profileImage = (String) properties.get("profile_image");
 		log.info("profileImage : {}", profileImage);
 		
-		// Map<String, Object> properties = (Map<String, Object>) principal.getAttributes().get("properties");
 		String image = (String) properties.get("profile_image");
-		String originalFilename = image.substring(image.lastIndexOf("/") + 1, image.length());
-		// 원본파일에서 확장자를 가져옴
-		String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, 
-				originalFilename.length());
-		// 첨부파일을 실제 저장할 때 저장될 파일명 (중복안되는)
-		String randomFilename = UUID.randomUUID().toString() + "." + ext;
-		// 파일 저장 시 폴더를 현재날짜로 구분하기 위한 경로를 추가
-		String addPath = "/" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-		// 실제로 파일이 저장경로
-		String savePath = new StringBuilder(rootPath).append(addPath).toString();
-		log.info("savePath : {}", savePath);
-		// 나중에 실제 웹에서 접근시 링크거는 용도 (이미지/동영상)
-		String imagePath = addPath + "/" + randomFilename;
-		// 저장될 폴더를 File로 변환
-		File saveDir = new File(savePath);
-		log.info("imagePath : {}", imagePath);
-		log.info("originalFilename : {}", originalFilename);
-		log.info("ext : {}", ext);
-		log.info("randomFilename : {}", randomFilename);
-		// 폴더가 없는경우 
-		if (!saveDir.isDirectory()) {
-			// 폴더 생성
-			saveDir.mkdirs();
-		}
+		FileCopyResult copyResult = fileService.copy(new URL(image).openStream(), image);
 		// 실제로 저장될 파일 객체
-		File out = new File(saveDir, randomFilename);
-		try {
-			log.info("out : {}", out.getAbsolutePath());
-			// 실제 파일을 저장
-			FileCopyUtils.copy(new URL(image).openStream(), new FileOutputStream(out));
-		} catch (IOException e) {
-			log.error("fileCopy", e);
-			throw new RuntimeException("파일을 저장하는 과정에 오류가 발생하였습니다.");
-		}			
 		// form -> member 로 변환
 		Member member = Member.builder()
 			.account(form.getAccount())
 			.password(form.getPassword())
 			.nickname(form.getNickname())
-			.profileImagePath(imagePath)
-			.profileImageName(originalFilename)
+			.profileImagePath(copyResult.imagePath())
+			.profileImageName(copyResult.originalFilename())
 			.oauth2ClientName(token.getAuthorizedClientRegistrationId())
 			.oauth2Id(token.getName())
 			.build();
@@ -181,11 +144,12 @@ public class MemberController {
 	 * 회원 가입 처리. (파일첨부 포함)
 	 * @param form
 	 * @return
+	 * @throws IOException 
 	 */
 	@PostMapping("/save-upload")
 	@RequestConfig(menu = "MEMBER", realnameCheck = true)
 	@ResponseBody
-	public HttpEntity<Boolean> saveUpload(@Validated MemberSaveUploadForm form) {
+	public HttpEntity<Boolean> saveUpload(@Validated MemberSaveUploadForm form) throws IOException {
 		log.info("form : {}", form);
 		log.info("nickname : {}", form.getNickname());
 		// 사용이 불가능 상태인경우
@@ -197,48 +161,15 @@ public class MemberController {
 		}
 		// 파일첨부 객체
 		MultipartFile profileImage = form.getProfileImage();
-		// 원본파일명
-		String originalFilename = profileImage.getOriginalFilename();
-		// 원본파일에서 확장자를 가져옴
-		String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, 
-				originalFilename.length());
-		// 첨부파일을 실제 저장할 때 저장될 파일명 (중복안되는)
-		String randomFilename = UUID.randomUUID().toString() + "." + ext;
-		// 파일 저장 시 폴더를 현재날짜로 구분하기 위한 경로를 추가
-		String addPath = "/" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-		// 실제로 파일이 저장경로
-		String savePath = new StringBuilder(rootPath).append(addPath).toString();
-		log.info("savePath : {}", savePath);
-		// 나중에 실제 웹에서 접근시 링크거는 용도 (이미지/동영상)
-		String imagePath = addPath + "/" + randomFilename;
-		// 저장될 폴더를 File로 변환
-		File saveDir = new File(savePath);
-		log.info("imagePath : {}", imagePath);
-		log.info("originalFilename : {}", originalFilename);
-		log.info("ext : {}", ext);
-		log.info("randomFilename : {}", randomFilename);
-		// 폴더가 없는경우 
-		if (!saveDir.isDirectory()) {
-			// 폴더 생성
-			saveDir.mkdirs();
-		}
-		// 실제로 저장될 파일 객체
-		File out = new File(saveDir, randomFilename);
-		try {
-			log.info("out : {}", out.getAbsolutePath());
-			// 실제 파일을 저장
-			FileCopyUtils.copy(profileImage.getInputStream(), new FileOutputStream(out));
-		} catch (IOException e) {
-			log.error("fileCopy", e);
-			throw new RuntimeException("파일을 저장하는 과정에 오류가 발생하였습니다.");
-		}		
+		FileCopyResult copyResult = fileService.copy(profileImage.getInputStream(), 
+			profileImage.getOriginalFilename());
 		// form -> member 로 변환
 		Member member = Member.builder()
 			.account(form.getAccount())
 			.password(form.getPassword())
 			.nickname(form.getNickname())
-			.profileImagePath(imagePath)
-			.profileImageName(originalFilename)
+			.profileImagePath(copyResult.imagePath())
+			.profileImageName(copyResult.originalFilename())
 			.build();
 		// 등록 처리
 		memberService.save(member);
