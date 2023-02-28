@@ -4,11 +4,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -71,6 +75,11 @@ public class WebSecurityConfigruation {
 				new BearerTokenAuthenticationFilter(jwtTokenAuthenticationManager),
 					AnonymousAuthenticationFilter.class);
 		return http.build();
+	}
+	
+	@Bean
+	OAuth2AuthorizedClientService auth2AuthorizedClient(JdbcOperations jdbcOperations, ClientRegistrationRepository repository) {
+		return new JdbcOAuth2AuthorizedClientService(jdbcOperations, repository);
 	}
 	
 	/**
