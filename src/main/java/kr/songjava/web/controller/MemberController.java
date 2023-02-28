@@ -3,8 +3,10 @@ package kr.songjava.web.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,8 +65,9 @@ public class MemberController {
 	 */
 	@GetMapping("/form")
 	@RequestConfig(menu = "MEMBER")
-	public void form() {
-		
+	public void form(@AuthenticationPrincipal DefaultOAuth2User user, Model model) {
+		log.debug("user : {}", user);
+		model.addAttribute("kakaoProperties", user.getAttributes().get("properties"));
 	}
 	
 	/**
@@ -94,10 +102,12 @@ public class MemberController {
 	 * @param form
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@PostMapping("/save")
-	@RequestConfig(menu = "MEMBER", realnameCheck = true)
+	@RequestConfig(menu = "MEMBER")
 	@ResponseBody
-	public HttpEntity<Boolean> save(HttpServletRequest request, @Validated MemberSaveForm form) {
+	public HttpEntity<Boolean> save(HttpServletRequest request, @Validated MemberSaveForm form, 
+			OAuth2AuthenticationToken token) {
 		log.info("form : {}", form);
 		log.info("nickname : {}", form.getNickname());
 		// 사용이 불가능 상태인경우
@@ -107,11 +117,57 @@ public class MemberController {
 		if (useAccount) {
 			throw new ApiException("아이디는 중복으로 사용이 불가능 합니다.");
 		}
+		OAuth2User oauth2User = token.getPrincipal();
+		Map<String, Object> properties = (Map<String, Object>) 
+				oauth2User.getAttributes().get("properties");
+		String profileImage = (String) properties.get("profile_image");
+		log.info("profileImage : {}", profileImage);
+		
+		// Map<String, Object> properties = (Map<String, Object>) principal.getAttributes().get("properties");
+		String image = (String) properties.get("profile_image");
+		String originalFilename = image.substring(image.lastIndexOf("/") + 1, image.length());
+		// 원본파일에서 확장자를 가져옴
+		String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, 
+				originalFilename.length());
+		// 첨부파일을 실제 저장할 때 저장될 파일명 (중복안되는)
+		String randomFilename = UUID.randomUUID().toString() + "." + ext;
+		// 파일 저장 시 폴더를 현재날짜로 구분하기 위한 경로를 추가
+		String addPath = "/" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+		// 실제로 파일이 저장경로
+		String savePath = new StringBuilder(rootPath).append(addPath).toString();
+		log.info("savePath : {}", savePath);
+		// 나중에 실제 웹에서 접근시 링크거는 용도 (이미지/동영상)
+		String imagePath = addPath + "/" + randomFilename;
+		// 저장될 폴더를 File로 변환
+		File saveDir = new File(savePath);
+		log.info("imagePath : {}", imagePath);
+		log.info("originalFilename : {}", originalFilename);
+		log.info("ext : {}", ext);
+		log.info("randomFilename : {}", randomFilename);
+		// 폴더가 없는경우 
+		if (!saveDir.isDirectory()) {
+			// 폴더 생성
+			saveDir.mkdirs();
+		}
+		// 실제로 저장될 파일 객체
+		File out = new File(saveDir, randomFilename);
+		try {
+			log.info("out : {}", out.getAbsolutePath());
+			// 실제 파일을 저장
+			FileCopyUtils.copy(new URL(image).openStream(), new FileOutputStream(out));
+		} catch (IOException e) {
+			log.error("fileCopy", e);
+			throw new RuntimeException("파일을 저장하는 과정에 오류가 발생하였습니다.");
+		}			
 		// form -> member 로 변환
 		Member member = Member.builder()
 			.account(form.getAccount())
 			.password(form.getPassword())
 			.nickname(form.getNickname())
+			.profileImagePath(imagePath)
+			.profileImageName(originalFilename)
+			.oauth2ClientName(token.getAuthorizedClientRegistrationId())
+			.oauth2Id(token.getName())
 			.build();
 		// 등록 처리
 		memberService.save(member);

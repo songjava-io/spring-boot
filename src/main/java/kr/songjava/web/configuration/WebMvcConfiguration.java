@@ -15,7 +15,6 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import kr.songjava.web.error.CustomErrorAttributes;
 import kr.songjava.web.interceptor.MemberAuthInterceptor;
-import kr.songjava.web.interceptor.MemberRealnameCheckInterceptor;
 import kr.songjava.web.interceptor.RequestLoggingInterceptor;
 
 @Configuration
@@ -23,13 +22,13 @@ import kr.songjava.web.interceptor.RequestLoggingInterceptor;
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
 	@Bean
-	public MappingJackson2JsonView jsonView() {
+	MappingJackson2JsonView jsonView() {
 		MappingJackson2JsonView jsonView = new MappingJackson2JsonView();
 		return jsonView;
 	}
 	
 	@Bean
-	public MessageSource messageSource() {
+	MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource source = 
 			new ReloadableResourceBundleMessageSource();
 		source.setBasename("classpath:config/messages/message");
@@ -48,7 +47,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	}
 	
 	@Bean
-	public CustomErrorAttributes customErrorAttributes() {
+	CustomErrorAttributes customErrorAttributes() {
 		return new CustomErrorAttributes();
 	}
 	
@@ -71,6 +70,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 			// 로그인 제외
 			.excludePathPatterns("/member/login")
 			.order(2);
+		/*
 		registry
 		// 사용할 인터셉터를 set
 		.addInterceptor(new MemberRealnameCheckInterceptor())
@@ -78,7 +78,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		.addPathPatterns("/member/save", "/member/save-upload")
 		// 로그인 제외
 		.excludePathPatterns("/member/login")
-		.order(2);		
+		.order(2);
+		*/		
 	}
 	
 	

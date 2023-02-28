@@ -21,6 +21,18 @@
 		FROM T_MEMBER
 		WHERE ACCOUNT = #{account}
 	</select>	
+	
+	<!-- 회원 OAuth 인증 조회 (Security 인증 전용) -->
+	<select id="selectMemberOauth2" parameterType="String" 
+		resultType="kr.songjava.web.domain.Member">
+		SELECT 
+			MEMBER_SEQ,
+			PASSWORD,
+			NICKNAME
+		FROM T_MEMBER
+		WHERE OAUTH2_CLIENT_NAME = #{oauth2ClientName}
+		AND OAUTH2_ID = #{oauth2Id}
+	</select>		
 
 	<insert id="insertMember" parameterType="kr.songjava.web.domain.Member"
 		useGeneratedKeys="true" keyProperty="memberSeq">
@@ -31,6 +43,8 @@
 			NICKNAME,
 			PROFILE_IMAGE_PATH,
 			PROFILE_IMAGE_NAME,
+			OAUTH2_CLIENT_NAME,
+			OAUTH2_ID,
 			JOIN_DATE
 		)
 		VALUES
@@ -39,7 +53,9 @@
 			#{password},
 			#{nickname},
 			#{profileImagePath},
-			#{profileImageName},			
+			#{profileImageName},		
+			#{oauth2ClientName},
+			#{oauth2Id},
 			NOW()
 		)
 	</insert>

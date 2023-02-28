@@ -59,7 +59,7 @@ public class WebSecurityConfigruation {
 				.userInfoEndpoint().userService(securityOauth2Service)
 			.and().and()
 			// csrf 사용안함.
-			.csrf().disable()
+			//.csrf().disable()
 			.formLogin(form -> {
 				form.successHandler(jwtTokenAuthenticationSuccessHandler);
 				form.permitAll();

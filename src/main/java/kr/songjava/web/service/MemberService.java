@@ -66,6 +66,16 @@ public class MemberService implements UserDetailsService {
 		return memberMapper.selectMemberAccount(username);
 	}
 	
+	/**
+	 * OAuth2 인증 방식의 로그인 대상 회원 조회
+	 * @param oauth2ClientName
+	 * @param oauth2Id
+	 * @return
+	 */
+	public Member selectMemberOauth2(String oauth2ClientName, String oauth2Id) {
+		return memberMapper.selectMemberOauth2(oauth2ClientName, oauth2Id);
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		log.info("loadUserByUsername : {}", username);
