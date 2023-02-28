@@ -12,7 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,14 +59,16 @@ public class MemberController {
 	public void login() {
 	}
 	
-	/**
-	 * 회원 정보 입력 화면
-	 */
+	
 	@GetMapping("/form")
 	@RequestConfig(menu = "MEMBER")
-	public void form() {
-		
+	public String form(@AuthenticationPrincipal DefaultOAuth2User auth2User, Model model) {
+		log.debug("auth2User : {}", auth2User);
+		log.debug("auth2User.getAttributes() : {}", auth2User.getAttributes());
+		model.addAttribute("kakaoProperties", auth2User.getAttributes().get("properties"));
+		return "member/form";
 	}
+		
 	
 	/**
 	 * 회원 정보 입력 화면 (파일첨부 포함)
@@ -95,9 +103,10 @@ public class MemberController {
 	 * @return
 	 */
 	@PostMapping("/save")
-	@RequestConfig(menu = "MEMBER", realnameCheck = true)
+	@RequestConfig(menu = "MEMBER")
 	@ResponseBody
-	public HttpEntity<Boolean> save(HttpServletRequest request, @Validated MemberSaveForm form) {
+	public HttpEntity<Boolean> save(HttpServletRequest request, @Validated MemberSaveForm form, 
+			OAuth2AuthenticationToken auth2User ) {
 		log.info("form : {}", form);
 		log.info("nickname : {}", form.getNickname());
 		// 사용이 불가능 상태인경우
@@ -112,6 +121,8 @@ public class MemberController {
 			.account(form.getAccount())
 			.password(form.getPassword())
 			.nickname(form.getNickname())
+			.oauth2ClientName(auth2User.getAuthorizedClientRegistrationId())
+			.oauth2Id(auth2User.getName())
 			.build();
 		// 등록 처리
 		memberService.save(member);
@@ -129,7 +140,8 @@ public class MemberController {
 	@PostMapping("/save-upload")
 	@RequestConfig(menu = "MEMBER", realnameCheck = true)
 	@ResponseBody
-	public HttpEntity<Boolean> saveUpload(@Validated MemberSaveUploadForm form) {
+	public HttpEntity<Boolean> saveUpload(@Validated MemberSaveUploadForm form,
+			@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient) {
 		log.info("form : {}", form);
 		log.info("nickname : {}", form.getNickname());
 		// 사용이 불가능 상태인경우

@@ -71,14 +71,17 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 			// 로그인 제외
 			.excludePathPatterns("/member/login")
 			.order(2);
+		/*
 		registry
 		// 사용할 인터셉터를 set
+		
 		.addInterceptor(new MemberRealnameCheckInterceptor())
 		// 추가한 인터셉터가 동작해야할 URL 패턴 추가
 		.addPathPatterns("/member/save", "/member/save-upload")
 		// 로그인 제외
 		.excludePathPatterns("/member/login")
-		.order(2);		
+		.order(2);
+		*/		
 	}
 	
 	

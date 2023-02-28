@@ -19,6 +19,8 @@ public class Member {
 	private String nickname;
 	private String profileImagePath;
 	private String profileImageName;
+	private String oauth2ClientName;
+	private String oauth2Id;
 	private Date joinDate;
 	
 }

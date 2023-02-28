@@ -7,7 +7,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import kr.songjava.web.exception.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class BasicControllerAdvice {
-	
-	private final MappingJackson2JsonView jsonView;
 	
 	private ModelAndView handleExceptionMessage(Exception e, HttpServletRequest request) {
 		String message = null;
