@@ -55,6 +55,7 @@ public class WebSecurityConfigruation {
 				"/member/realname-callback",
 				"/kakao/login",
 				"/kakao/calllback",
+				"/file/**",
 				fileProperties.resourcePath()
 			)
 			.permitAll()
