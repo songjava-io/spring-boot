@@ -3,11 +3,11 @@ server:
     path: /error-custom
 
 spring:
+  profiles:
+    # 프로퍼티 값을 정의하지 않으면 디폴트 값 set
+    default: local
   # 데이터베이스 접속정보 설정
   datasource:
-    username: root
-    password: 1234
-    url: jdbc:mariadb://localhost:3306/profile
     driver-class-name: org.mariadb.jdbc.Driver
   # 타임리프 설정 (기존에 JSP를 사용하던 방식을 .html 방식으로 사용설정)
   thymeleaf:
@@ -57,8 +57,3 @@ logging:
   level: 
     root: info
     '[kr.songjava]': DEBUG
-    
-# 파일 업로드 관련 설정    
-file:
-  rootPath: /spring-boot-fileupload
-  resourcePath: /static/image/**
