@@ -3,6 +3,8 @@ server:
     path: /error-custom
 
 spring:
+  profiles:
+    default: local
   # 데이터베이스 접속정보 설정
   datasource:
     username: root
@@ -41,3 +43,18 @@ logging:
 # 파일 업로드 관련 설정    
 file:
   root-path: /spring-boot-fileupload    
+  resource-path: /static/image/**
+
+
+
+
+
+
+
+
+
+
+
+
+
+

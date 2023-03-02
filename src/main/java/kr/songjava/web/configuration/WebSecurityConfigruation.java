@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import kr.songjava.web.configuration.properties.FileProperties;
 import kr.songjava.web.security.userdetails.DefaultAuthenticationSuccessHandler;
 
 @Configuration
@@ -16,7 +17,8 @@ public class WebSecurityConfigruation {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http,
-			DefaultAuthenticationSuccessHandler defaultAuthenticationSuccessHandler) throws Exception {
+			DefaultAuthenticationSuccessHandler defaultAuthenticationSuccessHandler,
+			FileProperties fileProperties) throws Exception {
 		http.authorizeRequests()
 			// 해당 url 패턴은 로그인 권한없어도 접근되게
 			.antMatchers(
@@ -29,7 +31,9 @@ public class WebSecurityConfigruation {
 				"/member/save-upload",
 				"/member/join**",
 				"/member/realname-callback",
-				"/kakao/**"
+				"/kakao/**",
+				"/file/download",
+				fileProperties.resourcePath()
 			)
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게
