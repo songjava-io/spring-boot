@@ -7,7 +7,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import kr.songjava.web.exception.ApiException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,7 +30,7 @@ public class MemberAuthInterceptor implements HandlerInterceptor {
 					boolean realname = realnameCheck == null ? false : (boolean) realnameCheck;
 					// 본인인증이 안된경우
 					if (!realname) {
-						throw new ApiException("본인인증이 필요합니다.");
+						// throw new ApiException("본인인증이 필요합니다.");
 					}
 				}
 			}
@@ -47,7 +46,7 @@ public class MemberAuthInterceptor implements HandlerInterceptor {
 			// 현재(URL에 맵핑된) 실행 될 컨트롤러에 메소드에 선언된 어노테이션을 가져옴
 			RequestConfig config = method.getMethodAnnotation(RequestConfig.class);
 			if (config != null) {
-				modelAndView.addObject("menu", config.menu());
+				//modelAndView.addObject("menu", config.menu());
 			}
 		}		
 	}

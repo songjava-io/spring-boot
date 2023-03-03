@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import kr.songjava.web.exception.ApiException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,7 +23,7 @@ public class MemberRealnameCheckInterceptor implements HandlerInterceptor {
 			boolean realname = realnameCheck == null ? false : (boolean) realnameCheck;
 			// 본인인증이 안된경우
 			if (!realname) {
-				throw new ApiException("본인인증이 필요합니다.");
+				//throw new ApiException("본인인증이 필요합니다.");
 			}
 		}
 		return true;

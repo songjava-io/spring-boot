@@ -5,9 +5,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.songjava.web.domain.Member;
+import kr.songjava.web.domain.Message;
+import kr.songjava.web.domain.MessageState;
+import kr.songjava.web.domain.MessageType;
 import kr.songjava.web.mapper.MemberMapper;
+import kr.songjava.web.mapper.MessageMapper;
 import kr.songjava.web.security.userdetails.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberService implements UserDetailsService {
 
 	private final MemberMapper memberMapper;
+	private final MessageMapper messageMapper;
 	
 	private final PasswordEncoder passwordEncoder;
 	
@@ -39,6 +45,7 @@ public class MemberService implements UserDetailsService {
 	 * 회원 등록
 	 * @param member
 	 */
+	@Transactional
 	public void save(Member member) {
 		String password = member.getPassword();
 		String encodePassword = passwordEncoder.encode(password);
@@ -49,6 +56,16 @@ public class MemberService implements UserDetailsService {
 		member.setPassword(encodePassword);
 		
 		memberMapper.insertMember(member);
+		
+		// 회원가입 성공 후 메일 전송을 위한 DB에 추가
+		Message message = new Message();
+		message.setSubject("회원가입 안내 메일");
+		message.setContents("회원가입을 축하드립니다.");
+		message.setState(MessageState.R);
+		message.setMsgType(MessageType.MAIL);
+		message.setSendEmail("master@fastcampus.co.kr");
+		message.setReceiveEmail(member.getAccount());
+		messageMapper.insertMessage(message);
 	}
 	
 	/**

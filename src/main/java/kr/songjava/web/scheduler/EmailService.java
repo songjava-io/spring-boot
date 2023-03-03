@@ -2,6 +2,6 @@ package kr.songjava.web.scheduler;
 
 public interface EmailService {
 
-	void send();
+	void send(EmailInfo info);
 	
 }

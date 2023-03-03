@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.songjava.web.mapper.MessageMapper">
+
+	<select id="selectMessageList" resultType="kr.songjava.web.domain.Message">
+		SELECT
+			MSG_SEQ,
+			MSG_TYPE,
+			SUBJECT,
+			CONTENTS,
+			RECEIVE_EMAIL,
+			SEND_EMAIL,
+			STATE,
+			SEND_DATE,
+			FAIL_DATE,
+			RECEIVE_PHONE			
+		FROM T_MESSAGE
+		<!-- 메세지가 실패했거나 준비중인 대상 -->
+		WHERE STATE IN ('R', 'N')
+		ORDER BY MSG_SEQ ASC
+		LIMIT 1
+	</select>
+	
+	<insert id="insertMessage">
+		INSERT INTO T_MESSAGE
+		(
+			MSG_TYPE,
+			SUBJECT,
+			CONTENTS,
+			RECEIVE_EMAIL,
+			SEND_EMAIL,
+			STATE,
+			SEND_DATE,
+			FAIL_DATE,
+			RECEIVE_PHONE	
+		)
+		VALUES
+		(
+			#{msgType},
+			#{subject},
+			#{contents},
+			#{receiveEmail},
+			#{sendEmail},
+			#{state},
+			NULL,
+			NULL,
+			#{receivePhone}
+		)
+	</insert>
+	
+	<update id="updateMessageStateSuccess">
+		UPDATE T_MESSAGE
+		SET
+			STATE = 'Y',
+			SEND_DATE = NOW()
+		WHERE MSG_SEQ = #{msgSeq}
+	</update>
+	
+	<update id="updateMessageStateFail">
+		UPDATE T_MESSAGE
+		SET
+			STATE = 'N',
+			FAIL_DATE = NOW()
+		WHERE MSG_SEQ = #{msgSeq}
+	</update>	
+	
+</mapper>

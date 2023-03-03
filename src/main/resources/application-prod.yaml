@@ -9,6 +9,20 @@ spring:
   servlet:
     multipart:
       location: /data/was/fileupload-temp
+  mail:
+    host: 127.0.0.1
+    port: 25
+    properties:
+      mail:
+        debug: true
+        smtp:
+          connectiontimeout: 5000
+          auth: false
+          starttls:
+            enable: false
+          ssl:
+            enable: false
+    
 logging:
   level: 
     root: info
@@ -16,7 +30,7 @@ logging:
     
 # 파일 업로드 관련 설정    
 file:
-  root-path: /data/was/fileupload
+  root-path: /spring-boot-fileupload
   resource-path: /static/image/**
   
 # 이메일 서비스 정의

@@ -33,6 +33,7 @@ public class WebSecurityConfigruation {
 				"/member/realname-callback",
 				"/kakao/**",
 				"/file/download",
+				"/redis/**",
 				fileProperties.resourcePath()
 			)
 			.permitAll()
