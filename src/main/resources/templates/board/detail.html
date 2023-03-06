@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/default-layout}">
+	layout:decorate="~{layouts/board-layout}">
 	<th:block layout:fragment="content">
 		<div class="card text-center">
 		  <div class="card-header">
@@ -9,26 +9,53 @@
 		  </div>
 		  <div class="card-body">
 		    <h5 class="card-title">[[${board.title}]]</h5>
-		    <p class="card-text">[[${board.contents}]]</p>
+		    <p class="card-text" tag:replaceLine="${board.contents}">내용</p>
 		  </div>
 		  <div class="card-footer text-muted">
 		    [[${board.regDate}]]
 		  </div>
 		</div>		
+		<h2>댓글</h2>
+		<div class="list-group">
+			<th:block th:each="comment : ${boardComments}">
+			<a href="javascript:;" class="list-group-item list-group-item-action"
+				aria-current="true">
+				<div class="d-flex w-100 justify-content-between">
+					<h5 class="mb-1" th:text="${comment.nickname}">List group item heading</h5>
+					<small th:text="${comment.regDate}">3 days ago</small>
+				</div>
+				<p class="mb-1" tag:replaceLine="${comment.comment}">Some placeholder content in a paragraph.</p>
+				<button type="button"
+					th:if="${comment.memberSeq == #authentication.principal.memberSeq}" 
+					th:attr="data-board-comment-seq=${comment.boardCommentSeq}"
+					class="btn btn-danger btn-sm btn-comment-delete">삭제</button>	
+				</a>
+			</th:block>
+		</div>		
+		<form id="board-comment-form" action="/board/comment/save" method="post">
+			<div class="mb-3">
+				<label for="comment" class="form-label">댓글</label>
+				<textarea class="form-control" name="comment" id="comment"
+					rows="3"></textarea>
+			</div>
+			<button type="submit" class="btn btn-primary">댓글 저장하기</button>
+		</form>
 		<div class="mt-2">
-			<a href="/board/list" class="btn btn-primary">목록</a>
-			
-			<a th:href="@{/board/edit/{boardSeq}(boardSeq=${board.boardSeq})}"
-				 class="btn btn-secondary">편집</a>
-				 
-			<a href="javascript:handleDelete();"
-				 class="btn  btn-danger">삭제</a>
+			<a th:href="@{/board/{boardType}(boardType=${board.boardType})}" class="btn btn-primary">목록</a>
+			<th:block th:if="${board.memberSeq == #authentication.principal.memberSeq}">
+				<a th:href="@{/board/{boardType}/edit/{boardSeq}(boardType=${board.boardType}, boardSeq=${board.boardSeq})}"
+					 class="btn btn-secondary">편집</a>
+					 
+				<a href="javascript:handleDelete();"
+					 class="btn  btn-danger">삭제</a>
+			</th:block>
 		</div> 
 	</th:block>
 	<th:block layout:fragment="script">
 		<script th:inline="javascript">
 		var boardSeq = [[${board.boardSeq}]];
-		
+		var csrfParameterName = [[${_csrf.parameterName}]];
+		var csrfToken = [[${_csrf.token}]];
 		function handleDelete() {
 			if (!confirm('정말 삭제하시겠습니까?')) {
 				return false;
@@ -37,6 +64,7 @@
 				url: '/board/delete',
 				type: 'post',
 				data: {
+					[csrfParameterName]: csrfToken,
 					boardSeq: boardSeq
 				},
 				success: function(data) {
@@ -50,6 +78,56 @@
 				}
 			});
 		}
+		// jquery가 로드 된 후 jquery 문법을 사용하기 위함
+		$(function() {
+			// 댓글 삭제 이벤트
+			$('.btn-comment-delete').on('click', function() {
+				var data = $(this).data();
+				console.log(data);
+				$.ajax({
+					url: '/board/comment/delete',
+					type: 'post',
+					data: {
+						[csrfParameterName]: csrfToken,
+						boardCommentSeq: data.boardCommentSeq,
+					},
+					success: function(data) {
+						console.log(data);
+						alert('댓글이 삭제되었습니다.');
+						// 현재 페이지를 새로고침..
+						location.reload();
+					},
+					error: function(data) {
+						console.log(data);
+						alert('오류가 발생하였습니다.');
+					}
+				});					
+			});
+			// 게시글 댓글 등록 이벤트 감지
+			$('#board-comment-form').submit(function() {
+				$.ajax({
+					url: '/board/comment/save',
+					type: 'post',
+					data: {
+						[csrfParameterName]: csrfToken,
+						boardSeq: boardSeq,
+						comment: $('#board-comment-form').find('textarea[name=comment]').val()
+					},
+					success: function(data) {
+						console.log(data);
+						alert('댓글이 등록되었습니다.');
+						// 현재 페이지를 새로고침..
+						location.reload();
+					},
+					error: function(data) {
+						console.log(data);
+						alert(data.responseJSON.message);
+					}
+				});				
+				// 페이지 이동하게 false처리
+				return false;
+			});
+		});
 		</script>
 	</th:block>
 </html>

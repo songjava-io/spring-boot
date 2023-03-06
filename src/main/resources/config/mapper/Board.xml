@@ -5,25 +5,36 @@
 
 <mapper namespace="kr.songjava.web.mapper.BoardMapper">
 
+	<resultMap type="kr.songjava.web.domain.Board" id="selectBoardListResultMap">
+		<result column="BOARD_TYPE" property="boardType" 
+			typeHandler="kr.songjava.web.handler.BoardTypeHandler"/>
+	</resultMap>
+
 	<!-- 게시물 목록 조회 쿼리 -->
-	<select id="selectBoardList" resultType="kr.songjava.web.domain.Board">
+	<select id="selectBoardList" resultMap="selectBoardListResultMap">
 		SELECT
 			BOARD_SEQ,
+			BOARD_TYPE,
 			TITLE,
 			REG_DATE
 		FROM T_BOARD
-		<!-- query 검색어가 공백이 아닌경우 -->
-		<if test="query != null and query.length() > 0">
-		WHERE TITLE LIKE CONCAT('%', CONCAT(#{query}, '%'))
-		</if>
+		<where>
+			<!-- 게시글 종류 검색조건 -->
+			AND BOARD_TYPE = #{boardType.code}
+			<!-- query 검색어가 공백이 아닌경우 -->
+			<if test="query != null and query.length() > 0">
+			AND TITLE LIKE CONCAT('%', CONCAT(#{query}, '%'))
+			</if>
+		</where>			
 		ORDER BY REG_DATE DESC
 	</select>
 	
 	<!-- 게시물 조회 쿼리 -->
 	<select id="selectBoard" parameterType="int"
-		 resultType="kr.songjava.web.domain.Board">
+		 resultMap="selectBoardListResultMap">
 		SELECT
 			BOARD_SEQ,
+			BOARD_TYPE,
 			TITLE,
 			CONTENTS,
 			MEMBER_SEQ,
@@ -36,6 +47,7 @@
 		useGeneratedKeys="true" keyProperty="boardSeq">
 		INSERT INTO T_BOARD
 		(
+			BOARD_TYPE,
 			TITLE,
 			CONTENTS,
 			MEMBER_SEQ,
@@ -43,6 +55,7 @@
 		)
 		VALUES
 		(
+			#{boardType.code},
 			#{title},
 			#{contents},
 			#{memberSeq},

@@ -20,6 +20,8 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import kr.songjava.web.configuration.properties.FileProperties;
+import kr.songjava.web.security.userdetails.DefaultAuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
@@ -36,7 +38,8 @@ public class WebSecurityConfigruation {
 		JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
 		JwtTokenAuthenticationManager jwtTokenAuthenticationManager,
 		Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
-		SecurityOauth2Service securityOauth2Service) throws Exception {
+		SecurityOauth2Service securityOauth2Service, DefaultAuthenticationSuccessHandler defaultAuthenticationSuccessHandler,
+		FileProperties fileProperties) throws Exception {
 		http.authorizeRequests()
 			// 해당 url 패턴은 로그인 권한없어도 접근되게
 			.antMatchers(
@@ -49,8 +52,9 @@ public class WebSecurityConfigruation {
 				"/member/save-upload",
 				"/member/join**",
 				"/member/realname-callback",
-				"/kakao/login",
-				"/kakao/calllback"
+				"/file/download",
+				"/redis/**",
+				fileProperties.resourcePath()
 			)
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게

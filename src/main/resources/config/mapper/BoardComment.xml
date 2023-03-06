@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.songjava.web.mapper.BoardCommentMapper">
+
+
+	<!-- 게시물 목록 조회 쿼리 -->
+	<select id="selectBoardCommentList" parameterType="int" resultType="kr.songjava.web.domain.BoardComment">
+		SELECT 
+			BC.BOARD_COMMENT_SEQ, 
+			BC.MEMBER_SEQ, 
+			BC.COMMENT, 
+			BC.REG_DATE, 
+			M.NICKNAME, 
+			M.ACCOUNT
+		FROM T_BOARD_COMMENT BC
+		JOIN T_MEMBER M
+		WHERE BC.MEMBER_SEQ = M.MEMBER_SEQ
+		AND BC.BOARD_SEQ = #{boardSeq}
+		ORDER BY BC.REG_DATE DESC
+	</select>
+	
+	<!-- 게시물 조회 쿼리 -->
+	<select id="selectBoardComment" parameterType="int"
+		 resultType="kr.songjava.web.domain.BoardComment">
+		SELECT 
+			BC.BOARD_COMMENT_SEQ, 
+			BC.MEMBER_SEQ, 
+			BC.COMMENT, 
+			BC.REG_DATE
+		FROM T_BOARD_COMMENT BC
+		WHERE BC.BOARD_COMMENT_SEQ = #{boardCommentSeq}
+	</select>
+	
+	<insert id="insertBoardComment" parameterType="kr.songjava.web.domain.BoardComment">
+		INSERT INTO T_BOARD_COMMENT
+		(
+			BOARD_SEQ,
+			MEMBER_SEQ,
+			COMMENT,
+			REG_DATE		
+		)
+		VALUES
+		(
+			#{boardSeq},
+			#{memberSeq},
+			#{comment},
+			NOW()
+		)
+	</insert>
+	
+	<delete id="deleteBoardComment" parameterType="int">
+		DELETE FROM T_BOARD_COMMENT
+		WHERE BOARD_COMMENT_SEQ = #{boardCommentSeq}
+	</delete>
+	
+	<!-- 게시물의 댓글을 삭제 -->
+	<delete id="deleteBoardCommentByBoardSeq" parameterType="int">
+		DELETE FROM T_BOARD_COMMENT
+		WHERE BOARD_SEQ = #{boardSeq}
+	</delete>	
+	
+</mapper>
+
+

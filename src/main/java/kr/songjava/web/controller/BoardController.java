@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.songjava.web.domain.Board;
+import kr.songjava.web.domain.BoardType;
 import kr.songjava.web.exception.ApiException;
 import kr.songjava.web.form.BoardSaveForm;
 import kr.songjava.web.interceptor.RequestConfig;
@@ -48,10 +49,10 @@ public class BoardController {
 		return model;
 	}
 	
-	@GetMapping
+	@GetMapping("/{boardType}")
 	@RequestConfig(menu = "BOARD")
-	public String list(Model model,
-			/*@Length(min = 2, max = 5)*/ @RequestParam(required = false) String query) 
+	public String list(Model model, @PathVariable BoardType boardType,
+			@RequestParam(required = false) String query) 
 			throws Exception {
 		logger.info("BoardController list 실행...");
 		// 검색조건 파라메터
@@ -67,45 +68,56 @@ public class BoardController {
 		Map<String, Object> paramMap = new HashMap<>();
 		
 		paramMap.put("query", query);
+		paramMap.put("boardType", boardType);
 		
 		// 서비스를 호출해서 게시물 목록을 리턴 받
 		List<Board> boardList = boardService.selectBoardList(paramMap);
-		
 		model.addAttribute("boardList", boardList);
+		// 등록화면에 이동할 때 사용
+		model.addAttribute("boardType", boardType);
+		model.addAttribute("boardTypes", BoardType.values());
 		return "board/list";
 	}
 	
 	
 	/**
-	 * 등록화면 
+	 * 상세화면 
 	 */
-	@GetMapping("/{boardSeq}")
+	@GetMapping("/{boardType}/{boardSeq}")
 	@RequestConfig(menu = "BOARD")
-	public String detail(Model model, @PathVariable int boardSeq) {
+	public String detail(Model model, @PathVariable BoardType boardType, @PathVariable int boardSeq) {
 		Board board = boardService.selectBoard(boardSeq);
 		Assert.notNull(board, "게시글 정보가 없습니다.");
 		model.addAttribute("board", board);
-		return "/board/detail";
+		model.addAttribute("boardTypes", BoardType.values());
+		// 게시글의 댓글 목록
+		model.addAttribute("boardComments", boardService.selectBoardCommentList(boardSeq));
+		return "board/detail";
 	}
 	
 	/**
 	 * 등록화면 
 	 */
-	@GetMapping("/form")
+	@GetMapping("/{boardType}/form")
 	@RequestConfig(menu = "BOARD")
-	public void form() {
-		
+	public String form(Model model, @PathVariable BoardType boardType) {
+		// 추후 서버에 전송 할 때 필요하기 때문에 model에 추가
+		model.addAttribute("boardType", boardType);
+		model.addAttribute("boardTypes", BoardType.values());
+		return "board/form";
 	}
 	
 	/**
 	 * 수정화면 
 	 */
-	@GetMapping("/edit/{boardSeq}")
+	@GetMapping("{boardType}/edit/{boardSeq}")
 	@RequestConfig(menu = "BOARD")
-	public String edit(Model model, @PathVariable int boardSeq) {
+	public String edit(Model model, @PathVariable BoardType boardType, @PathVariable int boardSeq) {
 		Board board = boardService.selectBoard(boardSeq);
+		model.addAttribute("boardType", boardType);
 		model.addAttribute("board", board);
-		return "/board/form";
+		model.addAttribute("boardTypes", BoardType.values());
+		return "board/form";
 	}
 	
 	/**
@@ -124,6 +136,7 @@ public class BoardController {
 		//SecurityUserDetails user = (SecurityUserDetails) authentication.getPrincipal();
 		
 		Board board = Board.builder()
+			.boardType(form.getBoardType())
 			.title(form.getTitle())
 			.contents(form.getContents())
 			.memberSeq(user.getMemberSeq())
@@ -131,7 +144,7 @@ public class BoardController {
 		// 게시물 저장
 		boardService.save(board);
 		// 목록 페이지로 이동
-		return "redirect:/board";
+		return "redirect:/board/" + form.getBoardType();
 	}
 	
 	/**
@@ -154,7 +167,7 @@ public class BoardController {
 		// 게시물 저장
 		boardService.save(board);
 		// 목록 페이지로 이동
-		return "redirect:/board";
+		return "redirect:/board/" + form.getBoardType();
 	}
 	
 	/**

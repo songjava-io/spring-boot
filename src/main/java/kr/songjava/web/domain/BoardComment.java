@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Board {
-
+public class BoardComment {
+	
+	private int boardCommentSeq; 
 	private int boardSeq;
-	private BoardType boardType;
-	private String title;
-	private String contents;
-	private int memberSeq;
-	private String regDate;
+	private int memberSeq; 
+	private String comment;
+	private String regDate; 
+	private String nickname; 
+	private String account;
 	
 }

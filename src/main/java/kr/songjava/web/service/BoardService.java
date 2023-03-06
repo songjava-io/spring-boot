@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.songjava.web.domain.Board;
+import kr.songjava.web.domain.BoardComment;
+import kr.songjava.web.mapper.BoardCommentMapper;
 import kr.songjava.web.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardService {
 
 	private final BoardMapper boardMapper;
+	private final BoardCommentMapper boardCommentMapper;
 	
 	public List<Board> selectBoardList(Map<String, Object> paramMap) {
 		return boardMapper.selectBoardList(paramMap);
@@ -27,6 +31,24 @@ public class BoardService {
 	 */
 	public Board selectBoard(int boardSeq) {
 		return boardMapper.selectBoard(boardSeq);
+	}
+	
+	/**
+	 * 게시물에 등록된 코멘트 목록 리턴
+	 * @param boardSeq
+	 * @return
+	 */
+	public List<BoardComment> selectBoardCommentList(int boardSeq) {
+		return boardCommentMapper.selectBoardCommentList(boardSeq);
+	}
+	
+	/**
+	 * 게시물 코멘트 단건 조회
+	 * @param boardCommentSeq
+	 * @return
+	 */
+	public BoardComment selectBoardComment(int boardCommentSeq) {
+		return boardCommentMapper.selectBoardComment(boardCommentSeq);
 	}
 	
 	/**
@@ -49,10 +71,29 @@ public class BoardService {
 	}
 	
 	/**
+	 * 게시글 댓글을 저장 처리.
+	 * @param comment
+	 */
+	public void saveComment(BoardComment comment) {
+		boardCommentMapper.insertBoardComment(comment);
+	}
+
+	/**
 	 * 게시물 삭제 처리.
 	 * @param boardSeq
 	 */
+	@Transactional
 	public void delete(int boardSeq) {
 		boardMapper.deleteBoard(boardSeq);
+		boardCommentMapper.deleteBoardCommentByBoardSeq(boardSeq);
 	}
+	
+	/**
+	 * 게시물 댓글 삭제 처리.
+	 * @param boardCommentSeq
+	 */
+	public void deleteComment(int boardCommentSeq) {
+		boardCommentMapper.deleteBoardComment(boardCommentSeq);
+	}
+	
 }
