@@ -16,6 +16,7 @@
 		resultType="kr.songjava.web.domain.Member">
 		SELECT 
 			MEMBER_SEQ,
+			ACCOUNT,
 			PASSWORD,
 			NICKNAME
 		FROM T_MEMBER
@@ -27,6 +28,7 @@
 		resultType="kr.songjava.web.domain.Member">
 		SELECT 
 			MEMBER_SEQ,
+			ACCOUNT,
 			PASSWORD,
 			NICKNAME
 		FROM T_MEMBER

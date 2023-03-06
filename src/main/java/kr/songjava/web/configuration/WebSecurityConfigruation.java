@@ -26,7 +26,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 import kr.songjava.web.configuration.properties.FileProperties;
 import kr.songjava.web.configuration.properties.FrontendProperties;
-import kr.songjava.web.security.userdetails.DefaultAuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
 import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
 import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
@@ -44,7 +43,7 @@ public class WebSecurityConfigruation {
 		JwtTokenAuthenticationSuccessHandler jwtTokenAuthenticationSuccessHandler,
 		JwtTokenAuthenticationManager jwtTokenAuthenticationManager,
 		Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
-		SecurityOauth2Service securityOauth2Service, DefaultAuthenticationSuccessHandler defaultAuthenticationSuccessHandler,
+		SecurityOauth2Service securityOauth2Service,
 		FileProperties fileProperties,
 		CorsConfigurationSource corsConfigurationSource,
 		UsernamePasswordAuthenticationFailureHandler usernamePasswordAuthenticationFailureHandler) throws Exception {
@@ -60,9 +59,10 @@ public class WebSecurityConfigruation {
 			.permitAll()
 			// 나머지 요청은 로그인을 해야 접근되게
 			.anyRequest().hasRole("USER").and()
-		//	.oauth2Login().successHandler(oauth2AuthenticationSuccessHandler).failureHandler(usernamePasswordAuthenticationFailureHandler).
-			//	.userInfoEndpoint().userService(securityOauth2Service)
-			//.and().and()
+			
+			.oauth2Login().successHandler(oauth2AuthenticationSuccessHandler).failureHandler(usernamePasswordAuthenticationFailureHandler)
+				.userInfoEndpoint().userService(securityOauth2Service)
+			.and().and()
 			.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)		
 			.and()
