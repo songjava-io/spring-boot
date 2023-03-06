@@ -1,4 +1,4 @@
-package kr.songjava.web.scheduler;
+package kr.songjava.web.configuration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -6,7 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import kr.songjava.web.configuration.properties.FileProperties;
+import kr.songjava.web.scheduler.EmailScheduler;
+import kr.songjava.web.service.DefaultEmailService;
+import kr.songjava.web.service.EmailService;
 import kr.songjava.web.service.MessageService;
+import kr.songjava.web.service.RealEmailService;
 
 //@Profile(value = "prod")
 @Configuration

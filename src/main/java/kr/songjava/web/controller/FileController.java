@@ -30,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FileController {
 
-private static final String ATTACHMENT_FORMAT = "attachment; filename=\"%s\";";
-	
+	private static final String ATTACHMENT_FORMAT = "attachment; filename=\"%s\";";
+
 	private final FileProperties fileProperties;
 
 	@GetMapping("/download")
@@ -44,17 +44,14 @@ private static final String ATTACHMENT_FORMAT = "attachment; filename=\"%s\";";
 			byte[] data = FileCopyUtils.copyToByteArray(new File(pathname.toAbsolutePath().toString()));
 			String disposition = String.format(ATTACHMENT_FORMAT, filename);
 			log.info("disposition : {}", disposition);
-			return ResponseEntity.ok()
-				.contentLength(data.length)
-				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.header(HttpHeaders.CONTENT_DISPOSITION, disposition)
-				.body(new ByteArrayResource(data));
+			return ResponseEntity.ok().contentLength(data.length).contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.header(HttpHeaders.CONTENT_DISPOSITION, disposition).body(new ByteArrayResource(data));
 		} catch (Exception e) {
 			log.error("download error", e);
 			throw new ApiException("파일을 찾을 수가 없습니다.");
 		}
 	}
-	
+
 	private String getEncodeFilename(HttpServletRequest request, String filename) throws UnsupportedEncodingException {
 		String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
 		log.info("userAgent : {}", userAgent);

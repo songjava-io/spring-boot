@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import kr.songjava.web.domain.Message;
+import kr.songjava.web.service.EmailInfo;
+import kr.songjava.web.service.EmailService;
 import kr.songjava.web.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

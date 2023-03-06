@@ -1,4 +1,4 @@
-package kr.songjava.web.scheduler;
+package kr.songjava.web.service;
 
 public interface EmailService {
 

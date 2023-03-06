@@ -1,4 +1,4 @@
-package kr.songjava.web.scheduler;
+package kr.songjava.web.service;
 
 import lombok.extern.slf4j.Slf4j;
 

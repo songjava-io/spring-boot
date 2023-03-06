@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import kr.songjava.web.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class DefaultAuthenticationSuccessHandler
 	implements AuthenticationSuccessHandler {
 	
 	private final MemberService memberService;
+	private final MappingJackson2JsonView jsonView;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -33,8 +35,11 @@ public class DefaultAuthenticationSuccessHandler
 		log.debug("userDetails : {}", userDetails);
 		// 회원 로그인 일자를 업데이트
 		memberService.updateLoginDate(userDetails.getMemberSeq());
-		// 메인페이지로 이동
-		response.sendRedirect("/home");
+		try {
+			jsonView.render(null, request, response);
+		} catch (Exception e) {
+			log.error("render error", e);
+		}
 	}
 
 }

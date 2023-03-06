@@ -45,7 +45,7 @@ public class CustomErrorAttributes implements ErrorAttributes, HandlerExceptionR
 		return null;
 	}
 
-	private void storeErrorAttributes(HttpServletRequest request, Exception ex) {
+	public void storeErrorAttributes(HttpServletRequest request, Exception ex) {
 		request.setAttribute(ERROR_INTERNAL_ATTRIBUTE, ex);
 	}
 
@@ -58,7 +58,7 @@ public class CustomErrorAttributes implements ErrorAttributes, HandlerExceptionR
 		return errorAttributes;
 	}
 
-	private Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
+	public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
 		Map<String, Object> errorAttributes = new LinkedHashMap<>();
 		errorAttributes.put("timestamp", new Date());
 		addStatus(errorAttributes, webRequest);

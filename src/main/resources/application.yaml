@@ -1,7 +1,3 @@
-server:
-  error:
-    path: /error-custom
-
 spring:
   profiles:
     default: local

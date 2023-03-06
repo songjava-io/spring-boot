@@ -37,7 +37,8 @@ file:
 email:
   service: real
 
-
+frontend:
+  domain: http://dev-spring.com:3000
 
 
 
