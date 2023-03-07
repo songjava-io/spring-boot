@@ -66,15 +66,17 @@ public class MemberController {
 		} else {
 			// 파일첨부 객체
 			MultipartFile profileImage = form.getProfileImage();
-			result = fileService.copy(profileImage.getInputStream(), profileImage.getOriginalFilename());			
+			if (profileImage != null) {
+				result = fileService.copy(profileImage.getInputStream(), profileImage.getOriginalFilename());
+			}
 		}
 		// form -> member 로 변환
 		Member member = Member.builder()
 			.account(form.getAccount())
 			.password(form.getPassword())
 			.nickname(form.getNickname())
-			.profileImagePath(result.imagePath())
-			.profileImageName(result.originalFilename())
+			.profileImagePath(result != null ? result.imagePath() : null)
+			.profileImageName(result != null ? result.originalFilename() : null)
 			.oauth2Id(oauth2Id)
 			.oauth2ClientName(oauth2ClientName)
 			.build();

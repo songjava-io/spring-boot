@@ -46,7 +46,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			Authentication authentication) throws IOException, ServletException {
 		// OAuth2 인증토큰으로 변환
 		OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-		OAuth2User user = (OAuth2User) token.getPrincipal();
+		OAuth2User user = token.getPrincipal();
 		Map<String, Object> attributes = user.getAttributes();
 		Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
 		Map<String, Object> profile = (Map<String, Object>) account.get("profile");

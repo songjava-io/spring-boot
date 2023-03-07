@@ -1,14 +1,21 @@
 package kr.songjava.web.configuration;
 
-import javax.crypto.spec.SecretKeySpec;
-
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.proc.SecurityContext;
+import kr.songjava.web.configuration.properties.FileProperties;
+import kr.songjava.web.configuration.properties.FrontendProperties;
+import kr.songjava.web.security.userdetails.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -20,17 +27,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.nimbusds.jose.proc.SecurityContext;
-
-import kr.songjava.web.configuration.properties.FileProperties;
-import kr.songjava.web.configuration.properties.FrontendProperties;
-import kr.songjava.web.security.userdetails.JwtTokenAuthenticationManager;
-import kr.songjava.web.security.userdetails.JwtTokenAuthenticationSuccessHandler;
-import kr.songjava.web.security.userdetails.Oauth2AuthenticationSuccessHandler;
-import kr.songjava.web.security.userdetails.SecurityOauth2Service;
-import kr.songjava.web.security.userdetails.UsernamePasswordAuthenticationFailureHandler;
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
@@ -54,6 +51,7 @@ public class WebSecurityConfigruation {
 				"/public/**", 
 				"/member/save",
 				"/file/download",
+				"/event/**",
 				fileProperties.resourcePath()
 			)
 			.permitAll()
@@ -102,6 +100,12 @@ public class WebSecurityConfigruation {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	JdbcOAuth2AuthorizedClientService JdbcOAuth2AuthorizedClientService(JdbcOperations operations,
+			ClientRegistrationRepository clientRegistrationRepository) {
+		return new JdbcOAuth2AuthorizedClientService(operations, clientRegistrationRepository);
 	}
 	
 	@Bean
